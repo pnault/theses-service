@@ -1,0 +1,64 @@
+
+ Fichier du dossier etudiant : t-m-1990-2015.csv
+ Fichier venant d'Archipel : ToadTextFile_2015-07-13T14_59_58.txt
+
+Pre-traitement du fichier t-m-1990-2015.csv
+
+Resultats :
+ Les sans SEQ : 7244 20150730/dossier-etudiant-directeurs-sans-seq
+ Avec SEQ : 9258 20150730/dossier-etudiant-directeurs-avec-seq
+
+Normalisation du fichier 20150730/dossier-etudiant-directeurs-avec-seq20150730
+ Nombre d'entrees dans le fichier : 9258 20150730/dossier-etudiant-directeurs-avec-seq
+ Nombre normalise (devrait etre le meme) : 9258 20150730/dossier-etudiant-directeurs-seq-acomparer
+
+Normalisation du fichier ToadTextFile_2015-07-13T14_59_58.txt
+ Nombre d'entrees dans le fichier : 4176
+ Nombre normalise (devrait etre le meme) : 4175 (moins un pour la ligne des intitules de colonne)
+
+Creation du fichier qui ne sont pas dans Archipel
+ Nombre qui ne sont pas dans Archipel : 5089 dossier-etudiant-pas-dans-archipel
+ Chiffre qui devrait : 5083
+ Creation d'un seul fichier
+
+On ne prends que ceux qui ont un courriel de directeur (1510 n'en n'ont pas)
+ Il en reste 10823 tous-dossier-pas-dans-archipel-avec-cour pour integration dans le repertoire des professeurs
+
+Modification du fichier dossier etudiant pour le fitter a l'unificateur
+
+On a 10823 entrees dans le dossier etudiant
+
+Modification du fichier archipel pour le fitter a l'autre
+
+On a 4175 entrees dans le fichier archipel
+
+On va importer 14998 entrees dans la BD
+
+Traitement termine
+
+
+Le reste se passe dans import-bd.sh
+
+--------------
+mysql  Ver 14.14 Distrib 5.1.73, for redhat-linux-gnu (x86_64) using readline 5.1
+
+Connection id:		1117
+Current database:	thesememoire
+Current user:		root@localhost
+SSL:			Not in use
+Current pager:		stdout
+Using outfile:		''
+Using delimiter:	;
+Server version:		5.1.73 Source distribution
+Protocol version:	10
+Connection:		Localhost via UNIX socket
+Server characterset:	utf8
+Db     characterset:	utf8
+Client characterset:	utf8
+Conn.  characterset:	utf8
+UNIX socket:		/var/lib/mysql/mysql.sock
+Uptime:			17 days 8 hours 38 min 54 sec
+
+Threads: 2  Questions: 65212  Slow queries: 4  Opens: 5615  Flush tables: 1  Open tables: 63  Queries per second avg: 0.43
+--------------
+

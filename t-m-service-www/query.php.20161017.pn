@@ -1,0 +1,130 @@
+<?php
+/*
+-Programme pour interroger la BD thesememoire
+-Retourne un réponse en format JSON
+-Créer le 20150803
+-Auteur : Pierre Nault
+*/
+
+$reqCour = $_GET['c'] . "@uqam.ca";
+
+if (isset($_GET['a'])) {
+	$a = $_GET['a'];
+}
+	
+$servername = "localhost";
+$username = "thesememoireuser";
+$password = "5EHAtCfhqJ";
+$dbname = "thesememoire";
+
+// info de connection
+$conn = mysqli_connect($servername, $username, $password, $dbname);
+// connexion
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+$sql = "SELECT auteur, diplome, seqentiel, titre, annee, archipel, courrielDir, docutype from thesememoire.listinfo where courrielDir = '$reqCour' order by annee desc";
+$result = mysqli_query($conn, $sql);
+$rows = array();
+
+if (mysqli_num_rows($result) > 0) {
+	while($r = mysqli_fetch_assoc($result)) {
+
+		// libellé = contenu du champs
+		$lastArray['auteurthese'] = preg_replace('/\*/', ', ', $r["auteur"]);
+		$lastArray['annee'] = substr($r["annee"], 0, 4);
+		$lastArray['titrethese'] = $r['titre'];
+		// règle pour mémoire ou doctorat
+		
+		// .20160912.pn -> modifs pour inclure tous les types
+
+		switch ($r['docutype']) {
+		case 0:
+        $dip = "Travail";
+        break;		
+		case 1:
+        $dip = "Rapport (de recherches)";
+        break;
+		case 2:
+        $dip = "Rapport (de stage)";
+        break;
+		case 3:
+        $dip = "Oeuvre";
+        break;
+		case 4:
+        $dip = "Mémoire";
+        break;
+		case 5:
+        $dip = "Thèse";
+        break;
+		case 6:
+        $dip = "Travaux dirigés";
+        break;
+		case 7:
+        $dip = "Rapport d'activités et projet d'intervention";
+        break;
+		case 8:
+        $dip = "Essai";
+        break;
+		case 5:
+        $dip = "Texte de création";
+        break;
+		}
+
+		/* .20160912.pn ->
+		if (preg_match("/maîtrise/i", $r['diplome'])) {
+			$dip = "maitrise";
+		} elseif(preg_match("/doctorat/i", $r['diplome'])) {
+			$dip = "doctorat";		
+		// pour les DESS et autres on affiche littéralement le contenu de diplome
+		} else {
+			$dip = $r['diplome'];
+		}
+		*/
+		
+		$lastArray['diplome'] = $dip;
+		
+		if ($r['archipel'] == "pasdansarchipel") {
+			$lastArray['dansarchipel'] = "non";
+			} else {
+			$lastArray['dansarchipel'] = "http://www.archipel.uqam.ca/" . str_replace("\r", "", $r['archipel']);
+			}
+		
+		// on met tous les ligne dans un dernier tableau
+		$rows['listeTheseMemoire'][] = $lastArray;
+
+	}
+	
+	$json = json_encode($rows);
+	print $json;
+	
+	if (isset($a)) {
+	
+		echo "<br /><br />";
+		// var_dump(json_decode($json, true));
+		$jsondecode = json_decode($json, true, 100);
+			foreach($jsondecode['listeTheseMemoire'] as $item) {
+			echo "<br />Auteur : " . $item['auteurthese'];
+			echo "<br />Année : " . $item['annee'];
+			echo "<br />Titre : " . $item['titrethese'];
+			echo "<br />Diplôme (selon le code): " . $item['diplome'];
+			if ($item['dansarchipel'] == "non") {
+				echo "<br />Archipel : " . "NON";
+				} else {
+				echo "<br />Archipel : " . "<a href=\"" . $item['dansarchipel'] . "\">http://www.archipel.uqam.ca/" . $item['dansarchipel'] . "</a>";
+			} 	
+		echo "<br /><br />";
+		}
+	}
+
+} else {
+	
+	// pas de résultat au niveau de la requête
+	echo "Pas de résultats";
+
+}
+
+mysqli_close($conn);
+
+?>

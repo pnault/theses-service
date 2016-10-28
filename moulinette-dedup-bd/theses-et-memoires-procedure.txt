@@ -1,0 +1,72 @@
+
+1- Extraire toutes les thèses et mémoires de Dossier Étudiant (2006-01 à aujourd'hui)
+
+2- Enregistrer sous -  le fichier créer en "CSV séparateur: point-virgule"
+
+** Supprimer la 1ère ligne (libellés)
+** Modifier l'encodage des caractères pour UTF-8 w/o BOM
+
+3- On ne garde que ceux qui ont un courriel pour la direction (comprend les sans SEQ)
+
+	egrep '@uqam.ca' t-m-1990-2015.csv > dossier-etudiant-directeurs
+
+-----Option pour les sans SEQ (plus d'autres traitement après cela)-----
+
+	-egrep -v ';[MD]-[0-9]+' t-m-1990-2015.csv > dossier-etudiant-directeurs-sans-seq
+
+	
+-----Option pour ceux qui ont un SEQ-----
+
+	-egrep ';[MD]-[0-9]+' t-m-1990-2015.csv > dossier-etudiant-directeurs-avec-seq
+
+
+-----Dans Archipel-----
+
+** à partir de TOAD faire la requête liste-thesMem-avec-directeurs-pour-routine.sql
+** CTRL-A; Export File Wizard; output format : Delimited text; column delimiter ";"; file encoding Unicode UTF-8
+** Supprimer la 1ère ligne (libellés)
+
+4- Combien de ligne à la base
+
+	wc -l ToadTextFile_2015-06-11T09_32_46.txt
+	
+4- Dans le fichier qui vient d'Archipel, retracer les SEQ conforment à ';[MD][0-9]+.pdf;' (qui n'ont pas de tiret)
+
+	-egrep ';[MD][0-9]+\.pdf;' ToadTextFile_2015-06-11T09_32_46.txt
+
+5- Les nons-conformes (avec tiret ou autre) ne matcheront pas avec la liste du Dossier Étudiants
+
+	egrep -v ';[MD][0-9]+\.pdf;' ToadTextFile_2015-06-11T09_32_46.txt
+
+	
+-----Comparaison et fusion SEQ-sans-SEQ-----
+	
+6- Normalisation des SEQ pour les comparer
+	
+	Ficher de Toad :
+	-sed 's/-[0-9]\.pdf//g' ToadTextFile_2015-06-11T09_32_46.txt | sed 's/\.pdf//g' > archipel-seq-acomparer
+	Vérification que tout est normalisé correctement (comparer les chiffres)
+	-sed 's/-[0-9]\.pdf//g' ToadTextFile_2015-06-11T09_32_46.txt | sed 's/\.pdf//g'| egrep ';[MD][0-9]+;'
+	
+	
+	Fichier du dossier étudiant :
+	-egrep ';[MD]-[0-9]+' dossier-etudiant-directeurs-avec-seq | sed 's/\(;[MD]\)-0*/\1/g' > dossier-etudiant-directeurs-seq-acomparer
+	
+7- Comparaison des fichiers avec SEQ et extraction de ceux qui ne sont pas dans Archipel
+	
+	ce qui n'est pas dans Archipel (et qui devrait l'être):
+	-awk -F ';' 'NR==FNR{c[$5]++;next};c[$7] == 0' archipel-seq-acomparer dossier-etudiant-directeurs-seq-acomparer
+
+	ce qui se trouve dans Archipel ET dans le dossier étudiant:
+	-awk -F ';' 'NR==FNR{c[$5]++;next};c[$7] > 0' archipel-seq-acomparer dossier-etudiant-directeurs-seq-acomparer
+	 
+	ce qui est dans Archipel mais pas dans le dossier étudiant:
+	-awk -F ';' 'NR==FNR{c[$7]++;next};c[$5] == 0' dossier-etudiant-directeurs-seq-acomparer archipel-seq-acomparer
+	 
+
+
+
+
+
+
+

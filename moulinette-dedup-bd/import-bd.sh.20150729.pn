@@ -1,0 +1,38 @@
+#!/bin/sh
+###############################################################################
+# Pierre Nault - .20150716.
+#
+# Pour importer les données sur thèse et mémoires
+#
+#
+###############################################################################
+
+
+#if [ "$1" != "" ]; then
+#    echo "Nom du fichier qui sera importe: $1"
+#else
+#   echo "J'ai besoin d'un nom de fichier !!!!"
+#	exit
+#fi
+
+#mysql -e "drop database refbasedata"
+
+#echo "Base de donnee dropee"
+ 
+mysql << EOF
+
+drop database thesememoire;
+
+create database thesememoire;
+
+use thesememoire;
+
+show status;
+
+EOF
+
+#mysql these-memoire < $1
+
+#echo "La base de donnee est bien rafraichit !"
+ 
+exit 0

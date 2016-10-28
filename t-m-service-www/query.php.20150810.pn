@@ -1,0 +1,80 @@
+<?php
+/*
+-Programme pour interroger la BD thesememoire
+-Retourne un réponse en format JSON
+-Créer le 20150803
+-Auteur : Pierre Nault
+*/
+
+/*$to = "portail-biblio@uqam.ca";
+$partAvantA = current(explode("@", $fromEmail)); 
+$fromName = $_POST['fieldFormName']; 
+//$subject = $_POST['fieldSubject'];
+// .20141010.pn -> ajout pour un # de dossier
+$moment = date("mdHis");
+$subject = "Mise à jour de la bibliographie - Demande: " . $moment; 
+*/
+
+$reqCour = $_GET['c'] . "@uqam.ca";
+
+$servername = "localhost";
+$username = "thesememoireuser";
+$password = "5EHAtCfhqJ";
+$dbname = "thesememoire";
+
+// info de connection
+$conn = mysqli_connect($servername, $username, $password, $dbname);
+// connexion
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+$sql = "SELECT auteur, diplome, seqentiel, titre, annee, archipel, courrielDir from thesememoire.listinfo where courrielDir = '$reqCour'";
+$result = mysqli_query($conn, $sql);
+$rows = array();
+
+if (mysqli_num_rows($result) > 0) {
+	while($r = mysqli_fetch_assoc($result)) {
+	
+		$lastArray['auteurthese'] = preg_replace('/\*/', ',', $r["auteur"]);
+		$lastArray['annee'] = substr($r["annee"], 0, 4);
+		$lastArray['titrethese'] = $r['titre'];
+		// règle pour mémoire ou doctorat
+		
+		if (preg_match("/maîtrise/i", $r['diplome'])) {
+			$dip = "maitrise";
+		} elseif(preg_match("/doctorat/i", $r['diplome'])) {
+			$dip = "doctorat";		
+		// pour les DESS et autres on affiche littéralement le contenu de diplome
+		} else {
+			$dip = $r['diplome'];
+		}
+		
+		$lastArray['diplome'] = $dip;
+		
+		if (preg_match("/[0-9]+/", $r['archipel'], $matches)) {
+			$url = "http://www.archipel.uqam.ca/" . $matches[0];
+		}
+		$lastArray['dansarchipel'] = $url;
+		
+		// on met tous les ligne dans un dernier tableau
+		$rows['listeTheseMemoire'][] = $lastArray;
+
+		
+//		$rows['reponse'][] = arraykeys()$r['auteur'] . $r['titre'];		
+//		$yup[] = preg_replace('/\*/', ',', $r["auteur"]);
+	}
+	
+	print json_encode($rows);
+//	print_r($rows);
+
+} else {
+	
+	echo "Pas de résultats";
+
+}
+
+
+mysqli_close($conn);
+
+?>
