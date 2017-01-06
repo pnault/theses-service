@@ -2,16 +2,16 @@
 ###############################################################################
 # Pierre Nault - .20150612.
 #
-# Déduplication des entrées entre les thèses et mémoires présents dans Archipel
-# et les entrées dans le dossier étudiants
+# DÃ©duplication des entrÃ©es entre les thÃ¨ses et mÃ©moires prÃ©sents dans Archipel
+# et les entrÃ©es dans le dossier Ã©tudiants
 #
 # Utiliser comme :
 #
 # ./the-mem-dedup.sh t-m-1990-2015.csv ToadTextFile_2015-06-11T09_32_46.txt
 #
-#  À utiliser avec une connection automatique pour mysql dans le shell 
+#  Ã€ utiliser avec une connection automatique pour mysql dans le shell 
 #
-#  .20160909.pn -> Inclu tous les types de diplômes, pas juste thèses et mémoires
+#  .20160909.pn -> Inclu tous les types de diplÃ´mes, pas juste thÃ¨ses et mÃ©moires
 #
 ###############################################################################
 
@@ -28,7 +28,7 @@ else
 	exit
 fi
 
-# ce n'est qu'à la fin qu'il faut enlever les courriels !!!!
+# ce n'est qu'Ã  la fin qu'il faut enlever les courriels !!!!
 #egrep '@uqam.ca' t-m-1990-2015.csv > dossier-etudiant-directeurs$moment
 
 printf "\n\nPre-traitement du fichier $1"
@@ -36,7 +36,7 @@ printf "\n\nPre-traitement du fichier $1"
 # on retire les sans SEQ qu'on recombinera par la suite
 egrep -v '\|[MD]-[0-9]+' $1 > $moment/dossier-etudiant-directeurs-sans-seq
 
-# création du fichier qu'on va comparer plus loin
+# crÃ©ation du fichier qu'on va comparer plus loin
 egrep '\|[MD]-[0-9]+' $1 > $moment/dossier-etudiant-directeurs-avec-seq
 
 
@@ -69,7 +69,7 @@ awk -F '|' 'NR==FNR{c[$4]++;next};c[$7] == 0' archipel-seq-acomparer dossier-etu
 
 printf "\n Nombre qui ne sont pas dans Archipel : `wc -l < dossier-etudiant-pas-dans-archipel`"
 
-# On donne un chiffre de comparaison entre la réalité et ce qui devrait être (marge d'erreur)
+# On donne un chiffre de comparaison entre la rÃ©alitÃ© et ce qui devrait Ãªtre (marge d'erreur)
 
 nbDossieretudiant=`wc -l < dossier-etudiant-directeurs-seq-acomparer`
 
@@ -93,7 +93,7 @@ printf "\n Il en reste `wc -l tous-dossier-pas-dans-archipel-avec-cour` pour int
 
 printf "\n\nModification du fichier dossier etudiant pour le fitter a l'unificateur"
 
-# on doit enelver les guillemets autrement ça fuck les donnees
+# on doit enelver les guillemets autrement Ã§a fuck les donnees
 
 sed 's/"//g' tous-dossier-pas-dans-archipel-avec-cour > tous-dossier-pas-dans-archipel-avec-cour-guill
 
@@ -131,5 +131,7 @@ printf "\n\nTraitement termine\n"
 printf "\n\nLe reste se passe dans import-bd.sh\n\n"
 
 ../import-bd-plus.sh
+
+#just one more line
 
 exit 0
